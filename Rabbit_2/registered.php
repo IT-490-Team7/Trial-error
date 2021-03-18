@@ -5,7 +5,24 @@ require_once __DIR__ . '/vendor/autoload.php';
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
 
+if (empty($_POST['name'])){
+    echo "Forgot to enter your Name";
+    exit(header("Refresh: 2; url=register.html"));
 
+}
+if(empty($_POST['email'])){
+    echo "Forgot to enter your Email";
+    exit(header("Refresh: 2; url=register.html"));
+}
+if(empty($_POST['password'])){
+    echo "Forgot to enter your Password";
+    exit(header("Refresh: 2; url=register.html"));
+}
+
+if (!check_pass_length($_POST['password'])){
+    echo 'Password must have 6 characters or more';
+    exit(header("Refresh: 2; url=register.html"));
+}
 
 $passhash = password_hash($_POST['password'], PASSWORD_DEFAULT);
 
