@@ -4,6 +4,7 @@ session_start();
 require_once __DIR__ . '/vendor/autoload.php';
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
+include ('functions.php');
 
 if (empty($_POST['name'])){
     echo "Forgot to enter your Name";
