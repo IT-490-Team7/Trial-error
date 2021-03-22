@@ -1,114 +1,68 @@
-<html lang="en">
-<head>
-    <title>Login</title>
-</head>
-<body>
-<form method="post">
-    <div>
-        <label for="email">Email</label><br>
-        <input type="email" id="email" name="email" placeholder="Email"/>
-    </div>
-    <div>
-        <label for="pass">Password</label><br>
-        <input type="password" id="pass" name="password" placeholder="Password"/>
-    </div>
-    <div>
-        <input class="submit" type="submit" name="login" value="Login"/>
-    </div>
-</form>
-</body>
-
-</html>
 <?php
-$error = '';
-//if (isset($_POST['email']) && isset($_POST['password'])) {
-if ($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['login'])) {
-    require_once '../db/config.php';
+session_start();
 
-    $email = trim($_POST['email']);
-    $password = trim($_POST['password']);
-    // Data sanitization to prevent SQL injection
-    $email = mysqli_real_escape_string($con, $_POST['email']);
-    $password = mysqli_real_escape_string($con, $_POST['password']);
+require_once __DIR__ . '/../vendor/autoload.php';
+use PhpAmqpLib\Connection\AMQPStreamConnection;
+use PhpAmqpLib\Message\AMQPMessage;
+include ("functions.php");
+include ("../db/config.php");
 
-    // Error message if the input field is left blank
-    if (empty($email)) {
-        $error .= '<p> "Please enter email!"</p>';
-        echo"Email required  ";
-    }
-    if (empty($password)) {
-        $error .= '<p> "Please enter password!"</p>';
-        echo"password required";
-    }
-    if(empty($error)){
-        if($query = $con->prepare("Select * From Users where email = ?")){
-            $query->bind_param('s',$email);
-            $query->execute();
-            $row = $query->fetch();
-            if($row){
-                if (password_verify($password, $row['password'])){
-                    echo"you are logged in";
-                    header("location:welcome.php");
-                    exit;
-                }
-                else{
-                    echo"wrong password";
-                    $error .= '<p>Wrong password</p>';
-                }
-            }
-            else{
-                echo"no email found";
-                $error .= '<p>No email found</p>';
-            }
-        }
-        $query->close();
-    }
-    mysqli_close($con);
-
-    // Checking for the errors
-    /*if (count($errors) == 0) {
-        if ($con){
-            print "Connected<br><br>";
-        }
-        // Password matching
-        $password = md5($password);
-
-        $query = "SELECT * FROM users WHERE email= '$email' AND password='$password'";
-        $results = mysqli_query($con, $query);
-        echo"hello";
-        // $results = 1 means that one user with the
-        // entered username exists
-        if (mysqli_num_rows($results) > 0) {
-
-            // Storing username in session variable
-            echo"you are logged in";
-
-            // Page on which the user is sent
-            // to after logging in
-            header('location: index.php');
-        }
-        else {
-
-            // If the username and password doesn't match
-            array_push($errors, "Username or password incorrect");
-            echo"not loggedin";
-        }
-    }*/
+$con = mysqli_connect('25.18.108.160', 'test', 'password', 'test');
+if (!$con) {
+    die("Connection failed" . mysqli_connect_error());
 }
-/*
-require_once '../db/config.php';
-$con = mysqli_connect('localhost','test','test','test');
+
 $email = $_POST['email'];
 $password = $_POST['password'];
 
-$sql = mysqli_query($con, "Select * from users where email='$email' and password='$password'");
-$row = mysqli_fetch_array($sql);
-
-if($row['email'] == $email && $row['password'] == $password){
-    header("location:welcome.php");
+if(empty($email)){
+    echo "Email field cannot be empty";
+}elseif (empty($password)){
+    echo "Password field cannot be empty";
 }
 else{
-    header("location:login.php?error=failed");
-}*/
 
-?>
+    $query = "SELECT * FROM users WHERE email = '$email'";
+    $result = mysqli_query($con, $query);
+
+    if (mysqli_num_rows($result) == 1) {
+        while ($row = mysqli_fetch_assoc($result)) {
+
+            if (password_verify($password, $row['password'])) {
+
+                $content = array(
+                    "email" => $email,
+                    "type" => $_POST['login']
+                );
+
+                $msgJson = json_encode($content);
+
+                $connection = new AMQPStreamConnection('25.14.30.215', 5672, 'admin', 'admin');
+                $channel = $connection->channel();
+                $channel->queue_declare('email', false, false, false, false);
+
+                $msg = new AMQPMessage($msgJson, array('delivery_mode' =>2 ));
+
+                $channel->basic_publish($msg, '', 'email');
+
+                echo "Successfully Login Redirecting to Welcome Page";
+                header("Refresh: 1; url=welcome.php");
+            }
+
+            else {
+
+                echo "Email or Password is invalid";
+                header("Refresh: 1; url=login.html");
+            }
+        }
+
+    }else{
+
+        echo "Email not found in database";
+        header("Refresh: 2; url=new.php");
+    }
+
+
+}
+$channel->close();
+$connection->close();
