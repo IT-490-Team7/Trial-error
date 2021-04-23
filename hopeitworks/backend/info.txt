@@ -1,0 +1,29 @@
+switch ($request['type'])
+    {
+        case "login":
+            $msg = doLogin($request['email'],$request['passw']);
+            break;
+        case "validate_session":
+            return doValidate($request['sessionId']);
+        case "register":
+            return newUser($request['LastName'],$request['FirstName'],$request['passw'],$request['DOB'],$request['email']);
+    }
+
+    $connect = dbconnect();
+
+    $query_reg = "INSERT INTO users (name, email, password) VALUES ('$name','$email','$password')";
+
+    ($result = mysqli_query( $connect, $query_reg )) or die(mysqli_error($connect));
+
+     if(!$result){
+
+         echo "failed to execute the register query:".PHP_EOL;
+         exit(0);
+
+     }
+     else{
+
+         //echo "new user registered";
+         return true;
+
+     }
