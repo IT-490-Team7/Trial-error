@@ -7,22 +7,27 @@
     <link href="Loginstyle.css" rel="stylesheet" type="text/css">
 </head>
 <body>
-<div class="login">
-    <h1>Login</h1>
-    <form action="login.php" method="post">
+<div class="topnav">
+    <a href="#about">About</a>
+    <a href="#about">Register</a>
+    <a class="active" href="./FrontPage/HomePage.html">Home</a>
+    <div class="login">
+        <h1>Login</h1>
+        <form action="login.php" method="post">
 
-        <label for="email">
-            <i class="fas fa-envelope"></i>
-        </label>
-        <input type="email" name="email" placeholder="Email" id="email" required>
+            <label for="email">
+                <i class="fas fa-envelope"></i>
+            </label>
+            <input type="email" name="email" placeholder="Email" id="email" required>
 
-        <label for="password">
-            <i class="fas fa-lock"></i>
-        </label>
-        <input type="password" name="password" placeholder="Password" id="password" required>
+            <label for="password">
+                <i class="fas fa-lock"></i>
+            </label>
+            <input type="password" name="password" placeholder="Password" id="password" required>
 
-        <input type="submit" name="submit" value="Login">
-    </form>
+            <input type="submit" name="submit" value="Login">
+        </form>
+    </div>
 </div>
 </body>
 </html>

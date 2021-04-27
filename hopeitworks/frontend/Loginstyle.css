@@ -13,6 +13,19 @@ body {
     position: relative;
     background-color: #435165;
 }
+.topnav {
+    overflow: hidden;
+    padding: 14px 16px;
+}
+.topnav a {
+    float: right;
+    display: flex;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    font-size: 17px;
+}
 .login {
     width: 400px;
     background-color: #ffffff;
