@@ -2,7 +2,7 @@
 require_once('hopeitworks/Rabbitmq/path.inc');
 require_once('hopeitworks/Rabbitmq/get_host_info.inc');
 require_once('hopeitworks/Rabbitmq/rabbitMQLib.inc');
-require_once('dbconnect.php');
+require_once('../db/dbconnect.php');
 
 $client = new rabbitMQClient("testRabbitMQ.ini","testServer");
 if (isset($argv[1]))

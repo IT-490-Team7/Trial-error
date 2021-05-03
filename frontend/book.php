@@ -1,4 +1,4 @@
-<?php include_once("../backend/dbconnect.php");
+<?php include_once("../db/dbconnect.php");
 session_start();
 if (!isset($_SESSION['email'])) {
     header("Location:LoginPage.php");
